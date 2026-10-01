@@ -1,4 +1,4 @@
-package com.example.task_game
+package com.tradejourney.app
 
 import io.flutter.embedding.android.FlutterActivity
 

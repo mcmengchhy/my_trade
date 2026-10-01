@@ -4,6 +4,7 @@ import 'package:home_widget/home_widget.dart';
 import '../models/challenge.dart';
 import '../models/user_profile.dart';
 import '../utils/challenge_math.dart';
+import '../widgets/widget_sparkline_chart.dart';
 
 class HomeWidgetService {
   static const String _iOSWidgetName = 'TradeChallengeWidget';
@@ -17,7 +18,7 @@ class HomeWidgetService {
   static Future<void> _safeSave(String key, String value) async {
     try {
       await HomeWidget.saveWidgetData<String>(key, value)
-          .timeout(const Duration(milliseconds: 100), onTimeout: () => null);
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
     } catch (_) {}
   }
 
@@ -27,12 +28,12 @@ class HomeWidgetService {
         name: _iOSWidgetName,
         iOSName: _iOSWidgetName,
         androidName: _androidWidgetName,
-      ).timeout(const Duration(milliseconds: 100), onTimeout: () => null);
+      ).timeout(const Duration(seconds: 2), onTimeout: () => null);
     } catch (_) {}
   }
 
-  /// Syncs active challenge balance, required daily profit, pace status, and
-  /// trader level data to native iOS and Android Home Screen Widgets.
+  /// Syncs active challenge balance, required daily profit, pace status,
+  /// equity chart, and trader level data to native Android & iOS Home Widgets.
   static Future<void> syncData({
     Challenge? activeChallenge,
     UserProfile? profile,
@@ -46,6 +47,7 @@ class HomeWidgetService {
         await _safeSave('target_balance', '\$0');
         await _safeSave('pace_status', 'Off');
         await _safeSave('required_today', 'Enable in settings');
+        await _safeSave('chart_path', '');
       } else if (activeChallenge != null) {
         final pace = paceStatus(activeChallenge);
         final paceLabel = pace == PaceStatus.ahead
@@ -69,12 +71,23 @@ class HomeWidgetService {
               ? '+\$${reqToday.toStringAsFixed(2)} req.'
               : '\$${reqToday.toStringAsFixed(2)} req.',
         );
+
+        // Render sparkline chart offscreen for Android Home Screen Widget
+        try {
+          await HomeWidget.renderFlutterWidget(
+            WidgetSparklineChart(challenge: activeChallenge),
+            key: 'chart_path',
+            logicalSize: const Size(300, 100),
+            pixelRatio: 2.0,
+          ).timeout(const Duration(seconds: 3), onTimeout: () => null);
+        } catch (_) {}
       } else {
         await _safeSave('challenge_name', 'No Active Challenge');
         await _safeSave('current_balance', '\$0.00');
         await _safeSave('target_balance', '\$0');
         await _safeSave('pace_status', 'No Data');
         await _safeSave('required_today', 'Create a challenge');
+        await _safeSave('chart_path', '');
       }
 
       if (profile != null) {

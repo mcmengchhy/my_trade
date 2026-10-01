@@ -13,6 +13,7 @@
 -keep class com.tradejourney.app.** { *; }
 
 # Keep Home Widget plugin classes
+-keep class es.antonborri.home_widget.** { *; }
 -keep class es.ximu.home_widget.** { *; }
 -keep class id.flutter.home_widget.** { *; }
 
