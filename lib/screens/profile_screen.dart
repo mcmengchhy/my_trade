@@ -200,28 +200,34 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   if (context.watch<ChallengesProvider>().isWidgetEnabled) ...[
                     const Divider(height: 1),
-                    ListTile(
-                      title: const Text('Displayed Challenge', style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: const Text('Select which challenge features on the widget'),
-                      trailing: DropdownButtonHideUnderline(
-                        child: DropdownButton<String?>(
-                          value: context.watch<ChallengesProvider>().selectedWidgetChallengeId,
-                          items: [
-                            const DropdownMenuItem<String?>(
-                              value: null,
-                              child: Text('Auto (First Active)', style: TextStyle(fontSize: 13)),
+                    Builder(
+                      builder: (context) {
+                        final rawSelectedId = context.watch<ChallengesProvider>().selectedWidgetChallengeId;
+                        final selectedId = challenges.any((c) => c.id == rawSelectedId) ? rawSelectedId : null;
+                        return ListTile(
+                          title: const Text('Displayed Challenge', style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: const Text('Select which challenge features on the widget'),
+                          trailing: DropdownButtonHideUnderline(
+                            child: DropdownButton<String?>(
+                              value: selectedId,
+                              items: [
+                                const DropdownMenuItem<String?>(
+                                  value: null,
+                                  child: Text('Auto (First Active)', style: TextStyle(fontSize: 13)),
+                                ),
+                                for (final c in challenges)
+                                  DropdownMenuItem<String?>(
+                                    value: c.id,
+                                    child: Text(c.name, style: const TextStyle(fontSize: 13)),
+                                  ),
+                              ],
+                              onChanged: (id) {
+                                context.read<ChallengesProvider>().setSelectedWidgetChallengeId(id);
+                              },
                             ),
-                            for (final c in challenges)
-                              DropdownMenuItem<String?>(
-                                value: c.id,
-                                child: Text(c.name, style: const TextStyle(fontSize: 13)),
-                              ),
-                          ],
-                          onChanged: (id) {
-                            context.read<ChallengesProvider>().setSelectedWidgetChallengeId(id);
-                          },
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ],

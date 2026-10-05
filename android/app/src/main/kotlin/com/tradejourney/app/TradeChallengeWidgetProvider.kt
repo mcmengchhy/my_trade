@@ -30,16 +30,21 @@ class TradeChallengeWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_pace, paceStatus)
                 setTextViewText(R.id.widget_level, traderLevel)
 
-                if (!chartPath.isNullOrEmpty()) {
+                val isNoActiveChallenge = challengeName == "No Active Challenge" || challengeName == "Widget Disabled"
+
+                if (!isNoActiveChallenge && !chartPath.isNullOrEmpty()) {
                     val bitmap = BitmapFactory.decodeFile(chartPath)
                     if (bitmap != null) {
                         setImageViewBitmap(R.id.widget_chart_image, bitmap)
                         setViewVisibility(R.id.widget_chart_image, View.VISIBLE)
+                        setViewVisibility(R.id.widget_balance_layout, View.GONE)
                     } else {
                         setViewVisibility(R.id.widget_chart_image, View.GONE)
+                        setViewVisibility(R.id.widget_balance_layout, View.VISIBLE)
                     }
                 } else {
                     setViewVisibility(R.id.widget_chart_image, View.GONE)
+                    setViewVisibility(R.id.widget_balance_layout, View.VISIBLE)
                 }
             }
             appWidgetManager.updateAppWidget(appWidgetId, views)

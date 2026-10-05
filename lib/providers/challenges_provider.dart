@@ -100,6 +100,10 @@ class ChallengesProvider extends ChangeNotifier {
 
   Future<void> deleteChallenge(String id) async {
     _challenges = _challenges.where((c) => c.id != id).toList();
+    if (_selectedWidgetChallengeId == id) {
+      _selectedWidgetChallengeId = null;
+      await _storage.saveSelectedWidgetChallengeId(null);
+    }
     notifyListeners();
     await _persist();
   }

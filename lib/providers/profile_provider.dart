@@ -20,7 +20,7 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> _syncHomeWidget() async {
     try {
-      await HomeWidgetService.syncData(profile: _profile);
+      await HomeWidgetService.syncData(profile: _profile, syncChallenge: false);
     } catch (_) {}
   }
 
